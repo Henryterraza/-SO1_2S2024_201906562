@@ -1,0 +1,1 @@
+savedcmd_/home/henryterraza/Documentos/Universidad/Sopes_1/2S-2024/Laboratorio/Tarea1/Module.symvers :=  scripts/mod/modpost -m -a      -o /home/henryterraza/Documentos/Universidad/Sopes_1/2S-2024/Laboratorio/Tarea1/Module.symvers -T /home/henryterraza/Documentos/Universidad/Sopes_1/2S-2024/Laboratorio/Tarea1/modules.order -i Module.symvers -e 
