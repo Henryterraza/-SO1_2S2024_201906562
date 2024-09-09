@@ -1,0 +1,13 @@
+{
+    "name": "low-js-app",
+    "version": "1.0.0",
+    "description": "Aplicación simple de bajo consumo con Express",
+    "main": "low.js",
+    "scripts": {
+      "start": "node low.js"
+    },
+    "dependencies": {
+      "express": "^4.18.2"
+    }
+  }
+  

@@ -1,0 +1,1 @@
+savedcmd_/home/henryterraza/SOPES1/Laboratorio/-SO1_2S2024_201906562/Tarea3/modulo/sysinfo_201906562.mod := printf '%s\n'   sysinfo_201906562.o | awk '!x[$$0]++ { print("/home/henryterraza/SOPES1/Laboratorio/-SO1_2S2024_201906562/Tarea3/modulo/"$$0) }' > /home/henryterraza/SOPES1/Laboratorio/-SO1_2S2024_201906562/Tarea3/modulo/sysinfo_201906562.mod

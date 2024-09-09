@@ -1,5 +1,5 @@
 env
-modulo/.**
+modulo/.**cd
 modulo/Module.symvers
 modulo/modules.order
 modulo/sysinfo.ko
