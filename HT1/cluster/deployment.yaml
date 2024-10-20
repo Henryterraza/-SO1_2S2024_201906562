@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-appp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-appp
+  template:
+    metadata:
+      labels:
+        app: go-appp
+    spec:
+      containers:
+      - name: go-appp
+        image: hterraza/my-go-app:v2
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080 
