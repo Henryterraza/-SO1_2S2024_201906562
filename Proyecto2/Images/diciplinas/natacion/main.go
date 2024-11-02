@@ -39,8 +39,8 @@ func (s *server) SendStudent(ctx context.Context, req *pb.StudentInfo) (*pb.Disc
 	}
 
 	// Respuesta a enviar al cliente
-	message := fmt.Sprintf("Estudiante %s de la facultad %s recibido en la disciplina %d",
-		req.Student, req.Faculty, req.Discipline)
+	message := fmt.Sprintf("Estudiante %s de la facultad %s recibido en la disciplina %d, es %s",
+		req.Student, req.Faculty, req.Discipline, topic)
 	return &pb.DisciplineResponse{Message: message}, nil
 }
 

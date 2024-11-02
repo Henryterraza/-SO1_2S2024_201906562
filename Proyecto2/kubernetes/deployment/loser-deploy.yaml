@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: golang-loser-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: golang-loser
+  template:
+    metadata:
+      labels:
+        app: golang-loser
+    spec:
+      containers:
+      - name: golang-loser
+        image: hterraza/golang-loser:1.0
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "100m"
