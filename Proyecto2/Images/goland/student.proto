@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package discipline;
+
+option go_package = "./packagestu;packagestu";
+
+
+service DisciplineService {
+    rpc SendStudent(StudentInfo) returns (DisciplineResponse);
+}
+
+message StudentInfo {
+    string student = 1;
+    int32 age = 2;
+    string faculty = 3;
+    int32 discipline = 4;
+}
+
+message DisciplineResponse {
+    string message = 1;
+}

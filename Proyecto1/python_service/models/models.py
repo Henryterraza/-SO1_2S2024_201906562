@@ -9,5 +9,10 @@ class LogProcess(BaseModel):
     rss: int
     memory_usage: float
     cpu_usage: float
-    action: str
-    timestamp: str
+    date: str
+
+class LogMemor(BaseModel):
+    total_ram: int
+    ram_libre: int
+    ram_usado: int
+    date: str

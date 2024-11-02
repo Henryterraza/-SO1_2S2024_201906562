@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: golang-atle-deploy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: golang-atle
+  template:
+    metadata:
+      labels:
+        app: golang-atle
+    spec:
+      containers:
+      - name: golang-atle
+        image: hterraza/diciplina-server:1.1
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "100m"
+        ports:
+        - containerPort: 50051
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: atletismo-svc
+  namespace: default
+spec:
+  selector:
+    app: golang-atle
+  ports:
+    - protocol: TCP
+      port: 50051
+      targetPort: 50051
+  type: ClusterIP

@@ -7,6 +7,11 @@ use std::process::Command;
 use std::sync::{Arc, Mutex};
 use std::thread;
 
+use ureq::{Error, Response};
+use serde_json::json;
+use serde_json::Value;
+use chrono::{Local, NaiveDateTime};
+
 #[derive(Debug, Serialize, Deserialize)]
 struct SystemInfo {
     #[serde(rename = "Processes")]
@@ -52,6 +57,14 @@ struct LogProcess {
     rss: i64,
     memory_usage: f64,
     cpu_usage: f64,
+    date: String,
+}
+#[derive(Debug, Serialize, Clone)]
+struct LogMemory {
+    total_ram: i32,
+    ram_libre: i32,
+    ram_usado: i32,
+    date: String,
 }
 
 impl Process {
@@ -162,6 +175,12 @@ fn analyzer(system_info: SystemInfo, idexcepcion: String) {
         for process in lowest_list.iter().take(lowest_list.len() - 3) {
             let log_proc_list_arc = Arc::clone(&log_proc_list_arc);
             let container_id = process.get_container_id().to_string();
+
+            let now = Local::now();
+    
+            // Define el formato personalizado
+            let custom_format = "%Y-%m-%d %H:%M:%S";
+
             let log_process = LogProcess {
                 pid: process.pid,
                 container_id: container_id.clone(),
@@ -170,6 +189,7 @@ fn analyzer(system_info: SystemInfo, idexcepcion: String) {
                 name: process.name.clone(),
                 memory_usage: process.memory_usage,
                 cpu_usage: process.cpu_usage,
+                date: now.format(custom_format).to_string(),
             };
 
             log_proc_list_arc.lock().unwrap().push(log_process.clone());
@@ -185,6 +205,11 @@ fn analyzer(system_info: SystemInfo, idexcepcion: String) {
         for process in highest_list.iter().skip(2) {
             let log_proc_list_arc = Arc::clone(&log_proc_list_arc);
             let container_id = process.get_container_id().to_string();
+            let now = Local::now();
+    
+            // Define el formato personalizado
+            let custom_format = "%Y-%m-%d %H:%M:%S";
+
             let log_process = LogProcess {
                 pid: process.pid,
                 container_id: container_id.clone(),
@@ -193,6 +218,7 @@ fn analyzer(system_info: SystemInfo, idexcepcion: String) {
                 name: process.name.clone(),
                 memory_usage: process.memory_usage,
                 cpu_usage: process.cpu_usage,
+                date: now.format(custom_format).to_string(),
             };
 
             log_proc_list_arc.lock().unwrap().push(log_process.clone());
@@ -215,7 +241,130 @@ fn analyzer(system_info: SystemInfo, idexcepcion: String) {
     }
 
     println!("------------------------------");
+
+    
+
+
+    let mut log_mem_list: Vec<LogMemory> = Vec::new();
+
+    let now = Local::now();
+    
+    // Define el formato personalizado
+    let custom_format = "%Y-%m-%d %H:%M:%S";
+
+    let log_mem = LogMemory {
+        total_ram:  memory_info.total_ram,
+        ram_libre: memory_info.ram_libre,
+        ram_usado: memory_info.ram_usado,
+        date: now.format(custom_format).to_string(),
+    };
+
+    log_mem_list.push(log_mem);
+
+    // println!("{:?}", log_mem_list);
+
+    // Si hay un error, se detendrá el programa usando panic
+    if let Err(e) = logMem(log_mem_list.clone()) {
+        panic!("Error: {:?}", e);
+    }
+
+    // Si hay un error, se detendrá el programa usando panic
+    if let Err(e) = logProc(log_proc_list.clone()) {
+        panic!("Error: {:?}", e);
+    }
+
 }
+
+
+
+fn logProc(procce: Vec<LogProcess>) -> Result<(), Error> {
+    // URL de prueba (httpbin) para realizar la solicitud POST
+    let url = "http://localhost:8000/logsProc";
+
+    // Realizando la solicitud POST
+    let proccess = json!(procce).to_string(); // Convertimos a String
+
+    // Hacemos el request POST enviando el JSON como cadena
+    let response: Result<Response, Error> = ureq::post(url)
+        .set("Content-Type", "application/json") // Añadir cabecera
+        .send_string(&proccess); // Enviar el JSON convertido a string
+
+    // Manejo de la respuesta
+    match response {
+        Ok(resp) => {
+            let body = resp.into_string()?; // Obtener el cuerpo de la respuesta como String
+            println!("Respuesta recibida: {}", body);
+        }
+        Err(ureq::Error::Status(code, resp)) => {
+            println!("Error con código {}: {}", code, resp.into_string()?);
+        }
+        Err(e) => {
+            println!("Error al realizar el POST: {:?}", e);
+        }
+    }
+
+    Ok(())
+}
+
+
+fn logMem(procce: Vec<LogMemory>) -> Result<(), Error> {
+    // URL de prueba (httpbin) para realizar la solicitud POST
+    let url = "http://localhost:8000/logsMem";
+
+    // Realizando la solicitud POST
+    let proccess = json!(procce).to_string(); // Convertimos a String
+
+    // Hacemos el request POST enviando el JSON como cadena
+    let response: Result<Response, Error> = ureq::post(url)
+        .set("Content-Type", "application/json") // Añadir cabecera
+        .send_string(&proccess); // Enviar el JSON convertido a string
+
+    // Manejo de la respuesta
+    match response {
+        Ok(resp) => {
+            let body = resp.into_string()?; // Obtener el cuerpo de la respuesta como String
+            println!("Respuesta recibida: {}", body);
+        }
+        Err(ureq::Error::Status(code, resp)) => {
+            println!("Error con código {}: {}", code, resp.into_string()?);
+        }
+        Err(e) => {
+            println!("Error al realizar el POST: {:?}", e);
+        }
+    }
+
+    Ok(())
+}
+
+
+
+fn logs_graficar() -> Result<(), ureq::Error> {
+    // URL del endpoint al que queremos hacer el GET
+    let url = "http://localhost:8000/Grafics";
+
+    // Realizando la solicitud GET
+    let response = ureq::get(url).call();
+
+    // Manejo de la respuesta
+    match response {
+        Ok(resp) => {
+            let body = resp.into_string()?; // Obtener el cuerpo de la respuesta como String
+            println!("Respuesta recibida: {}", body);
+        }
+        Err(ureq::Error::Status(code, resp)) => {
+            println!("Error con código {}: {}", code, resp.into_string()?);
+        }
+        Err(e) => {
+            println!("Error al realizar el GET: {:?}", e);
+        }
+    }
+
+    Ok(())
+}
+
+
+
+
 
 fn read_proc_file(file_name: &str) -> io::Result<String> {
     let path = Path::new("/proc").join(file_name);
@@ -288,6 +437,9 @@ fn main() {
     loop {
         if *stop_signal.lock().unwrap() {
             fin_cronjob();
+            if let Err(e) = logs_graficar() {
+                panic!("Error: {:?}", e);
+            }
             break;
         }
 

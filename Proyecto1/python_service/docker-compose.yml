@@ -5,6 +5,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./logs:/code/logs
+      - ./logs:/code/logs_processes
+      - ./logs:/code/logs_memory
+      - ./data:/mnt/data
     command: ["fastapi", "run", "main.py", "--port", "8000"]
-

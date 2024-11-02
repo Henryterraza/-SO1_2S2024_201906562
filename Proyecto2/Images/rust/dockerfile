@@ -1,0 +1,31 @@
+
+
+# Usar una imagen base oficial de Rust para la etapa de compilación
+FROM rust:1.80.1 AS builder
+
+# Establecer el directorio de trabajo
+WORKDIR /rust
+
+RUN rustup component add rustfmt
+# Copiar el archivo de configuración y el código fuente
+COPY Cargo.toml Cargo.lock ./
+COPY src ./src
+COPY build.rs ./
+
+# Compilar el proyecto
+RUN cargo build --release
+
+# Crear una imagen más pequeña para ejecutar la aplicación
+FROM debian:bookworm
+
+# Instalar las bibliotecas necesarias
+RUN apt-get update && apt-get install -y libc6 && rm -rf /var/lib/apt/lists/*
+
+# Copiar el binario desde la etapa de compilación
+COPY --from=builder /rust/target/release/rust /rust
+
+# Exponer el puerto en el que corre la aplicación
+EXPOSE 8080
+
+# Comando para ejecutar la aplicación
+CMD ["/rust"]
